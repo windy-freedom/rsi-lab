@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="RSI Lab：一个每天通过 GitHub Actions 自我进化并发布到 Cloudflare Pages 的网页演示。" />
+    <title>RSI Lab · 自我进化演示</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23151c29'/%3E%3Cpath d='M17 43 28 21l8 14 6-10 6 18' fill='none' stroke='%239fffc2' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <main class="shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="RSI Lab 首页">
+          <span class="brand-mark">R</span>
+          <span>RSI LAB</span>
+        </a>
+        <nav class="nav" aria-label="页面导航">
+          <a class="active" href="#overview">运行看板</a>
+          <a href="#design">项目设计</a>
+          <a href="#loop">每日循环</a>
+        </nav>
+        <button class="reload-button" id="reload" type="button">刷新状态 <span aria-hidden="true">↗</span></button>
+      </header>
+
+      <section class="intro" id="top">
+        <div class="intro-copy">
+          <p class="eyebrow"><span class="pulse-dot"></span> DAILY RECURSIVE IMPROVEMENT</p>
+          <h1>让一个网页，<br /><em>自己长出下一版。</em></h1>
+          <p class="lede">RSI Lab 是一个可观察的自我进化实验：每天提出一个小假设，留下证据，更新网页，并把结果提交回 GitHub。</p>
+        </div>
+        <div class="intro-side">
+          <div class="run-card">
+            <div class="run-card-head"><span>系统状态</span><span class="status-label"><i></i> {STATUS}</span></div>
+            <div class="run-card-main"><span class="run-version">{VERSION}</span><span class="run-arrow">↗</span></div>
+            <div class="run-card-foot"><span>最近一次进化</span><strong>{DATE}</strong></div>
+          </div>
+          <p class="micro-copy">下一轮运行由 GitHub Actions 的每日 cron 触发，输出自动发布到 Cloudflare Pages。</p>
+        </div>
+      </section>
+
+      <section class="metric-grid" id="overview" aria-label="当前状态指标">
+        <article class="metric-card featured"><div class="metric-top"><span>综合评分</span><span class="metric-spark">↗</span></div><strong id="score">—</strong><div class="meter"><span id="score-meter"></span></div><small>四项指标的平均值</small></article>
+        <article class="metric-card"><div class="metric-top"><span>进化轮次</span><span class="metric-index">01</span></div><strong id="cycles">—</strong><small>次已记录迭代</small><div class="mini-bars" id="cycle-bars" aria-hidden="true"></div></article>
+        <article class="metric-card"><div class="metric-top"><span>自主性</span><span class="metric-index">03</span></div><strong id="autonomy">—</strong><small>受控范围内的选择能力</small><div class="metric-line"><span id="autonomy-line"></span></div></article>
+        <article class="metric-card"><div class="metric-top"><span>可学习性</span><span class="metric-index">04</span></div><strong id="learnability">—</strong><small>从结果中形成下一假设</small><div class="metric-line mint"><span id="learnability-line"></span></div></article>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel trajectory-panel">
+          <div class="panel-heading"><div><p class="section-kicker">01 / MEMORY</p><h2>进化轨迹</h2></div><span class="panel-note">从 v0.1.0 到现在</span></div>
+          <div class="trajectory-chart" id="trajectory-chart" aria-label="综合评分趋势"></div>
+          <div class="legend"><span><i class="legend-dot blue"></i>综合评分</span><span><i class="legend-dot mint"></i>稳定性</span><span class="legend-note">每次迭代都保留</span></div>
+          <div class="iteration-list" id="iteration-list"></div>
+        </article>
+
+        <article class="panel hypothesis-panel">
+          <div class="panel-heading"><div><p class="section-kicker">02 / NEXT MOVE</p><h2>下一条假设</h2></div><span class="tag">待验证</span></div>
+          <div class="hypothesis-quote" id="next-hypothesis">—</div>
+          <div class="evidence-block"><span class="evidence-label">选择依据</span><p id="selection-rationale">下一轮会读取最新指标，优先关注当前最弱的一项。</p></div>
+          <div class="hypothesis-footer"><span>mutation pool / 4 candidates</span><span class="arrow-large">↗</span></div>
+        </article>
+      </section>
+
+      <section class="section-block" id="design">
+        <div class="section-heading"><div><p class="section-kicker">03 / SYSTEM MAP</p><h2>项目设计</h2></div><p>把“自我进化”拆成能被人看懂、能被机器执行的六个模块。</p></div>
+        <div class="table-wrap"><table><thead><tr><th>模块</th><th>它要回答的问题</th><th>演示中的实现</th><th>边界</th></tr></thead><tbody>
+          <tr><td><span class="module-number">01</span>观察</td><td>系统现在是什么状态？</td><td>读取历史迭代和四项指标</td><td>只读结构化数据</td></tr>
+          <tr><td><span class="module-number">02</span>假设</td><td>下一步为什么值得做？</td><td>从 mutation pool 选择方向</td><td>候选范围固定</td></tr>
+          <tr><td><span class="module-number">03</span>变更</td><td>具体改变了什么？</td><td>追加一条 iteration 记录</td><td>不碰权限与工作流</td></tr>
+          <tr><td><span class="module-number">04</span>评估</td><td>这次真的更好了吗？</td><td>计算综合分与指标增量</td><td>演示用启发式评分</td></tr>
+          <tr><td><span class="module-number">05</span>记忆</td><td>系统如何避免重复犯错？</td><td>JSON 历史 + Git commit</td><td>每次变化可追溯</td></tr>
+          <tr><td><span class="module-number">06</span>发布</td><td>如何让下一版被看到？</td><td>Wrangler 部署到 Cloudflare Pages</td><td>密钥只在 Actions 中</td></tr>
+        </tbody></table></div>
+      </section>
+
+      <section class="section-block" id="loop">
+        <div class="section-heading"><div><p class="section-kicker">04 / DAILY LOOP</p><h2>每日循环</h2></div><p>一天一轮，小步变化；失败保留现场，成功才推进版本。</p></div>
+        <div class="loop-grid">
+          <article class="loop-step"><span class="step-index">01</span><h3>读取</h3><p>读取当前 JSON、最近分数与上一次假设。</p><span class="step-code">READ STATE</span></article>
+          <article class="loop-step"><span class="step-index">02</span><h3>选择</h3><p>找出短板，从受控候选池中选择下一方向。</p><span class="step-code">PICK MUTATION</span></article>
+          <article class="loop-step"><span class="step-index">03</span><h3>评估</h3><p>计算指标与综合分，并留下可读的决策理由。</p><span class="step-code">SCORE CHANGE</span></article>
+          <article class="loop-step"><span class="step-index">04</span><h3>提交</h3><p>写入发布副本，提交 GitHub，再更新 Cloudflare。</p><span class="step-code">COMMIT + SHIP</span></article>
+        </div>
+      </section>
+
+      <section class="guardrail-strip"><div><p class="section-kicker">GUARDRAILS</p><h2>自主，但不失控。</h2></div><p>这不是让系统随意改写自己的权限，而是让它在明确的边界里持续提出、验证和记录下一步。</p><div class="guardrail-list"><span><i>✓</i> 幂等运行</span><span><i>✓</i> Git 可回滚</span><span><i>✓</i> 最小权限</span></div></section>
+
+      <footer class="footer"><span>RSI LAB / v0.4.0</span><span>DESIGNED FOR OBSERVABLE EVOLUTION</span><a href="../README.md">查看项目设计文档 ↗</a></footer>
+    </main>
+    <script src="app.js" defer></script>
+  </body>
+</html>

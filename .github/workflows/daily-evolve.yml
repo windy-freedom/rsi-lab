@@ -1,0 +1,53 @@
+name: Daily RSI evolution
+
+on:
+  schedule:
+    # 01:00 UTC = 09:00 Asia/Shanghai.
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  evolve-and-publish:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run one bounded RSI iteration
+        id: evolve
+        shell: bash
+        run: |
+          node scripts/evolve.mjs
+          if git diff --quiet -- data/evolution.json dist/data/evolution.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit the new evolution record
+        if: steps.evolve.outputs.changed == 'true'
+        shell: bash
+        run: |
+          git config user.name "rsi-evolution-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/evolution.json dist/data/evolution.json
+          git commit -m "chore: daily RSI evolution $(date -u +%F)"
+          git push
+
+      - name: Publish the evolved page to Cloudflare Pages
+        if: steps.evolve.outputs.changed == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --branch=${{ github.ref_name }}

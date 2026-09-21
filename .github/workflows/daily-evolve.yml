@@ -45,7 +45,7 @@ jobs:
           git push
 
       - name: Publish the evolved page to Cloudflare Pages
-        if: steps.evolve.outputs.changed == 'true'
+        if: steps.evolve.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}

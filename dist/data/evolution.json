@@ -7,12 +7,12 @@
     "goal": "用可观察、可回滚的每日循环演示自我进化。"
   },
   "metrics": {
-    "clarity": 88,
-    "stability": 97,
-    "autonomy": 74,
-    "learnability": 84
+    "clarity": 91,
+    "stability": 99,
+    "autonomy": 76,
+    "learnability": 88
   },
-  "nextHypothesis": "如果候选方向按最近一次低分指标加权选择，下一轮进化会更像基于反馈的决策。",
+  "nextHypothesis": "如果每轮都保留一条未采纳的替代路径，系统就能把‘保持不变’也变成可学习的结果。",
   "iterations": [
     {
       "date": "2026-09-14",
@@ -136,6 +136,23 @@
       },
       "decision": "adopted",
       "rationale": "本轮聚焦“自主性”，综合评分为 86；变更范围仍限制在数据和演示层。"
+    },
+    {
+      "date": "2026-09-22",
+      "version": "v0.8.0",
+      "hypothesis": "如果每轮都保留一条未采纳的替代路径，系统就能把‘保持不变’也变成可学习的结果。",
+      "changes": [
+        "记录保留的替代路径",
+        "区分 adopted 与 hold"
+      ],
+      "metrics": {
+        "clarity": 91,
+        "stability": 99,
+        "autonomy": 76,
+        "learnability": 88
+      },
+      "decision": "adopted",
+      "rationale": "本轮聚焦“可学习性”，综合评分为 89；变更范围仍限制在数据和演示层。"
     }
   ]
 }

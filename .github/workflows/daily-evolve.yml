@@ -44,6 +44,14 @@ jobs:
           git commit -m "chore: daily RSI evolution $(date -u +%F)"
           git push
 
+      - name: Tag the released version
+        if: steps.evolve.outputs.changed == 'true'
+        shell: bash
+        run: |
+          VERSION=$(node -e 'const fs=require("fs"); const state=JSON.parse(fs.readFileSync("data/evolution.json", "utf8")); console.log(state.project.version || state.iterations.at(-1).version)')
+          git tag -a "$VERSION" -m "Release $VERSION"
+          git push origin "$VERSION"
+
       - name: Publish the evolved page to Cloudflare Pages
         if: steps.evolve.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         uses: cloudflare/wrangler-action@v3

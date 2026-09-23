@@ -43,6 +43,15 @@ if (latest?.date === today) {
   process.exit(0);
 }
 
+const versionPattern = /^v(\d+)\.(\d+)\.(\d+)$/;
+const seenVersions = new Set();
+for (const iteration of state.iterations) {
+  if (!versionPattern.test(iteration.version) || seenVersions.has(iteration.version)) {
+    throw new Error(`Invalid or duplicate iteration version: ${iteration.version}`);
+  }
+  seenVersions.add(iteration.version);
+}
+
 const previous = latest?.metrics ?? state.metrics;
 const weakestMetric = Object.entries(previous).sort((a, b) => a[1] - b[1])[0]?.[0] ?? "clarity";
 const candidateIndex = (state.iterations.length + weakestMetric.length) % mutationPool.length;
@@ -51,13 +60,25 @@ const nextMetrics = Object.fromEntries(
   Object.entries(previous).map(([key, value]) => [key, Math.min(99, value + (candidate.delta[key] ?? 1))])
 );
 const score = Math.round(Object.values(nextMetrics).reduce((sum, value) => sum + value, 0) / 4);
-const nextVersion = `v0.${state.iterations.length + 1}.0`;
+const currentVersion = latest?.version ?? "v0.0.0";
+const versionMatch = currentVersion.match(versionPattern);
+if (!versionMatch) throw new Error(`Cannot increment version: ${currentVersion}`);
+const nextVersion = `v${versionMatch[1]}.${Number(versionMatch[2]) + 1}.0`;
+const updateSummary = `围绕“${candidate.focus}”完成一次受控更新：${candidate.changes.join("、")}。`;
 
 state.metrics = nextMetrics;
 state.nextHypothesis = candidate.hypothesis;
+state.project.version = nextVersion;
+state.project.versioning = {
+  scheme: "semver",
+  current: nextVersion,
+  updatedAt: today,
+  summary: updateSummary
+};
 state.iterations.push({
   date: today,
   version: nextVersion,
+  summary: updateSummary,
   hypothesis: candidate.hypothesis,
   changes: candidate.changes,
   metrics: nextMetrics,

@@ -7,12 +7,12 @@
     "goal": "用可观察、可回滚的每日循环演示自我进化。"
   },
   "metrics": {
-    "clarity": 91,
+    "clarity": 94,
     "stability": 99,
-    "autonomy": 76,
-    "learnability": 88
+    "autonomy": 77,
+    "learnability": 91
   },
-  "nextHypothesis": "如果每轮都保留一条未采纳的替代路径，系统就能把‘保持不变’也变成可学习的结果。",
+  "nextHypothesis": "如果让每轮变更都带一条可读的证据，复盘者会更容易区分真正的学习与随机漂移。",
   "iterations": [
     {
       "date": "2026-09-14",
@@ -153,6 +153,23 @@
       },
       "decision": "adopted",
       "rationale": "本轮聚焦“可学习性”，综合评分为 89；变更范围仍限制在数据和演示层。"
+    },
+    {
+      "date": "2026-09-23",
+      "version": "v0.9.0",
+      "hypothesis": "如果让每轮变更都带一条可读的证据，复盘者会更容易区分真正的学习与随机漂移。",
+      "changes": [
+        "为迭代记录补充证据摘要",
+        "把证据与决策并列展示"
+      ],
+      "metrics": {
+        "clarity": 94,
+        "stability": 99,
+        "autonomy": 77,
+        "learnability": 91
+      },
+      "decision": "adopted",
+      "rationale": "本轮聚焦“可解释性”，综合评分为 90；变更范围仍限制在数据和演示层。"
     }
   ]
 }

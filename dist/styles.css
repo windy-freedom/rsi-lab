@@ -48,6 +48,10 @@ h1 em { color: var(--blue); font-family: var(--serif); font-weight: 400; letter-
 .run-card-foot { border-top: 1px solid var(--line); padding-top: 14px; }
 .run-card-foot strong { color: var(--ink); font-weight: 500; }
 .micro-copy { color: var(--faint); font-size: 12px; line-height: 1.65; margin: 16px 0 0; }
+.release-note { margin-top: 22px; padding: 14px 0 0 14px; border-left: 2px solid var(--blue); }
+.release-label { display: block; margin-bottom: 6px; color: var(--blue); font-size: 10px; letter-spacing: .15em; }
+.release-note strong { display: block; color: var(--ink); font-size: 13px; font-weight: 500; line-height: 1.5; }
+.release-note p { margin: 5px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
 .metric-grid { display: grid; grid-template-columns: 1.35fr repeat(3, 1fr); gap: 10px; margin-bottom: 59px; }
 .metric-card { min-height: 171px; border: 1px solid var(--line); background: var(--panel); padding: 19px 20px 18px; }
 .metric-card.featured { background: linear-gradient(130deg, #223348, #1a2837); border-color: rgba(131,183,255,.34); }

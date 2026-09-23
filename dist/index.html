@@ -37,6 +37,11 @@
             <div class="run-card-foot"><span>最近一次进化</span><strong>{DATE}</strong></div>
           </div>
           <p class="micro-copy">下一轮运行由 GitHub Actions 的每日 cron 触发，输出自动发布到 Cloudflare Pages。</p>
+          <div class="release-note" aria-live="polite">
+            <span class="release-label">本次版本更新</span>
+            <strong id="release-summary">—</strong>
+            <p id="release-details">—</p>
+          </div>
         </div>
       </section>
 
@@ -87,7 +92,7 @@
 
       <section class="guardrail-strip"><div><p class="section-kicker">GUARDRAILS</p><h2>自主，但不失控。</h2></div><p>这不是让系统随意改写自己的权限，而是让它在明确的边界里持续提出、验证和记录下一步。</p><div class="guardrail-list"><span><i>✓</i> 幂等运行</span><span><i>✓</i> Git 可回滚</span><span><i>✓</i> 最小权限</span></div></section>
 
-      <footer class="footer"><span>RSI LAB / v0.4.0</span><span>DESIGNED FOR OBSERVABLE EVOLUTION</span><a href="../README.md">查看项目设计文档 ↗</a></footer>
+      <footer class="footer"><span>RSI LAB / <span id="footer-version">—</span></span><span>DESIGNED FOR OBSERVABLE EVOLUTION</span><a href="../README.md">查看项目设计文档 ↗</a></footer>
     </main>
     <script src="app.js" defer></script>
   </body>

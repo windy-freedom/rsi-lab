@@ -12,13 +12,20 @@ const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({"&":
 function render(state) {
   const iterations = state.iterations || [];
   const latest = iterations.at(-1) || { version: "—", date: "—", metrics: state.metrics };
+  const currentVersion = state.project?.version || latest.version || "—";
+  const versioning = state.project?.versioning || {};
+  const releaseSummary = latest.summary || versioning.summary || (latest.changes?.length ? `本次版本更新：${latest.changes.join("、")}。` : "完成一轮受控进化。");
+  const releaseDetails = latest.changes?.join("；") || "等待下一轮更新内容。";
   const score = average(state.metrics);
   const scores = iterations.map((item) => average(item.metrics));
 
   document.title = `${state.project?.name || "RSI Lab"} · 自我进化演示`;
   document.querySelector(".status-label").innerHTML = `<i></i> ${escapeHtml(state.project?.status || "演示运行中")}`;
-  document.querySelector(".run-version").textContent = latest.version;
+  document.querySelector(".run-version").textContent = currentVersion;
   document.querySelector(".run-card-foot strong").textContent = latest.date;
+  $("#footer-version").textContent = currentVersion;
+  $("#release-summary").textContent = releaseSummary;
+  $("#release-details").textContent = releaseDetails;
   $("#score").textContent = score;
   $("#score-meter").style.width = `${score}%`;
   $("#cycles").textContent = iterations.length;

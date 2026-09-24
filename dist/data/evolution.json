@@ -4,7 +4,14 @@
     "tagline": "让一个网页，自己长出下一版",
     "status": "演示运行中",
     "owner": "RSI Core",
-    "goal": "用可观察、可回滚的每日循环演示自我进化。"
+    "goal": "用可观察、可回滚的每日循环演示自我进化。",
+    "version": "v0.5.0",
+    "versioning": {
+      "scheme": "semver",
+      "current": "v0.5.0",
+      "updatedAt": "2026-09-24",
+      "summary": "规则回退围绕“可解释性”完成一次受控更新：为迭代记录补充证据摘要、把证据与决策并列展示。"
+    }
   },
   "site": {
     "heroTagline": "自己长出下一版。",
@@ -14,19 +21,28 @@
     "guardrailCopy": "这不是让系统随意改写自己的权限，而是让它在明确的边界里持续提出、验证和记录下一步。"
   },
   "metrics": {
-    "clarity": 82,
-    "stability": 91,
-    "autonomy": 68,
-    "learnability": 76
+    "clarity": 85,
+    "stability": 92,
+    "autonomy": 69,
+    "learnability": 79
   },
-  "nextHypothesis": "如果把每轮变更拆成“假设—证据—决策”，旁观者会更容易判断进化是否真的发生。",
+  "nextHypothesis": "如果让每轮变更都带一条可读的证据，复盘者会更容易区分真正的学习与随机漂移。",
   "iterations": [
     {
       "date": "2026-09-14",
       "version": "v0.1.0",
       "hypothesis": "先建立一个可被观察的 RSI 最小闭环。",
-      "changes": ["加入版本状态卡", "记录首轮假设", "定义四项评估指标"],
-      "metrics": {"clarity": 68, "stability": 74, "autonomy": 32, "learnability": 54},
+      "changes": [
+        "加入版本状态卡",
+        "记录首轮假设",
+        "定义四项评估指标"
+      ],
+      "metrics": {
+        "clarity": 68,
+        "stability": 74,
+        "autonomy": 32,
+        "learnability": 54
+      },
       "decision": "adopted",
       "rationale": "闭环已经存在，但证据与决策还没有被放在同一个视图里。"
     },
@@ -34,8 +50,17 @@
       "date": "2026-09-15",
       "version": "v0.2.0",
       "hypothesis": "把每日运行变成幂等操作，可以提高系统稳定性。",
-      "changes": ["增加日期去重", "同步发布副本", "为无变化运行提供明确结果"],
-      "metrics": {"clarity": 73, "stability": 84, "autonomy": 44, "learnability": 61},
+      "changes": [
+        "增加日期去重",
+        "同步发布副本",
+        "为无变化运行提供明确结果"
+      ],
+      "metrics": {
+        "clarity": 73,
+        "stability": 84,
+        "autonomy": 44,
+        "learnability": 61
+      },
       "decision": "adopted",
       "rationale": "同一天重跑不会污染历史，稳定性明显改善，适合继续自动化。"
     },
@@ -43,8 +68,17 @@
       "date": "2026-09-16",
       "version": "v0.3.0",
       "hypothesis": "将候选方向限制在受控 mutation pool，可在保持自主性的同时降低漂移。",
-      "changes": ["加入候选方向池", "记录选择理由", "锁定工作流和权限文件"],
-      "metrics": {"clarity": 78, "stability": 88, "autonomy": 57, "learnability": 69},
+      "changes": [
+        "加入候选方向池",
+        "记录选择理由",
+        "锁定工作流和权限文件"
+      ],
+      "metrics": {
+        "clarity": 78,
+        "stability": 88,
+        "autonomy": 57,
+        "learnability": 69
+      },
       "decision": "adopted",
       "rationale": "自主选择仍然存在，但系统边界变得清晰，任何变更都更容易审计。"
     },
@@ -52,10 +86,39 @@
       "date": "2026-09-17",
       "version": "v0.4.0",
       "hypothesis": "如果把“假设—变更—指标—决策”连成一条轨迹，演示会更容易被复盘。",
-      "changes": ["加入进化轨迹视图", "展示综合评分趋势", "补充项目设计与护栏表格"],
-      "metrics": {"clarity": 82, "stability": 91, "autonomy": 68, "learnability": 76},
+      "changes": [
+        "加入进化轨迹视图",
+        "展示综合评分趋势",
+        "补充项目设计与护栏表格"
+      ],
+      "metrics": {
+        "clarity": 82,
+        "stability": 91,
+        "autonomy": 68,
+        "learnability": 76
+      },
       "decision": "adopted",
       "rationale": "当前版本已能同时说明系统做了什么、为什么做，以及下一轮准备学习什么。"
+    },
+    {
+      "date": "2026-09-24",
+      "version": "v0.5.0",
+      "source": "fallback",
+      "summary": "规则回退围绕“可解释性”完成一次受控更新：为迭代记录补充证据摘要、把证据与决策并列展示。",
+      "hypothesis": "如果让每轮变更都带一条可读的证据，复盘者会更容易区分真正的学习与随机漂移。",
+      "changes": [
+        "为迭代记录补充证据摘要",
+        "把证据与决策并列展示"
+      ],
+      "metrics": {
+        "clarity": 85,
+        "stability": 92,
+        "autonomy": 69,
+        "learnability": 79
+      },
+      "decision": "adopted",
+      "rationale": "当前最弱指标为“autonomy”，从受控候选池选择“可解释性”。",
+      "evidence": "基于最近一轮结构化指标的规则回退。"
     }
   ]
 }

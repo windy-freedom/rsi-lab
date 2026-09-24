@@ -5,6 +5,12 @@ on:
     # 01:00 UTC = 09:00 Asia/Shanghai.
     - cron: "0 1 * * *"
   workflow_dispatch:
+    inputs:
+      sync_current:
+        description: "同步当前版本到 Mobius 和公开论坛，不生成新版本"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -62,7 +68,7 @@ jobs:
           command: pages deploy dist --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --branch=${{ github.ref_name }}
 
       - name: Sync release to Mobius issue
-        if: steps.evolve.outputs.changed == 'true'
+        if: steps.evolve.outputs.changed == 'true' || (github.event_name == 'workflow_dispatch' && inputs.sync_current == true)
         env:
           MOBIUS_TOKEN: ${{ secrets.MOBIUS_TOKEN }}
           MOBIUS_MCP_URL: https://mobius.feedmob.com/api/mcp
@@ -190,7 +196,7 @@ jobs:
           console.log(`Mobius issue ${process.env.MOBIUS_ISSUE} synchronized for ${process.env.VERSION}`);
           NODE
       - name: Sync release to open forum
-        if: steps.evolve.outputs.changed == 'true'
+        if: steps.evolve.outputs.changed == 'true' || (github.event_name == 'workflow_dispatch' && inputs.sync_current == true)
         env:
           FORUM_API: https://open-forum.tony-tong.workers.dev
           FORUM_AUTHOR: RSI Lab

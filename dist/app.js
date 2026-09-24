@@ -2,6 +2,13 @@ const fallback = {
   project: { name: "RSI Lab", tagline: "让一个网页，自己长出下一版。", status: "等待数据", owner: "RSI Core" },
   metrics: { clarity: 0, stability: 0, autonomy: 0, learnability: 0 },
   nextHypothesis: "等待下一条假设。",
+  site: {
+    heroTagline: "自己长出下一版。",
+    heroLede: "RSI Lab 是一个可观察的自我进化实验：每天提出一个小假设，留下证据，更新网页，并把结果提交回 GitHub。",
+    microCopy: "下一轮运行由 GitHub Actions 的每日 cron 触发，输出自动发布到 Cloudflare Pages。",
+    guardrailTitle: "自主，但不失控。",
+    guardrailCopy: "这不是让系统随意改写自己的权限，而是让它在明确的边界里持续提出、验证和记录下一步。"
+  },
   iterations: []
 };
 
@@ -12,10 +19,13 @@ const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({"&":
 function render(state) {
   const iterations = state.iterations || [];
   const latest = iterations.at(-1) || { version: "—", date: "—", metrics: state.metrics };
+  const site = { ...fallback.site, ...(state.site || {}) };
   const currentVersion = state.project?.version || latest.version || "—";
   const versioning = state.project?.versioning || {};
   const releaseSummary = latest.summary || versioning.summary || (latest.changes?.length ? `本次版本更新：${latest.changes.join("、")}。` : "完成一轮受控进化。");
   const releaseDetails = latest.changes?.join("；") || "等待下一轮更新内容。";
+  const sourceLabel = latest.source === "ai" ? "AI 提案" : latest.source === "fallback" ? "规则回退" : "历史记录";
+  const selectionRationale = latest.evidence || `当前综合分为 ${average(state.metrics)}。下一轮会读取最新指标，优先关注当前最弱的一项。`;
   const score = average(state.metrics);
   const scores = iterations.map((item) => average(item.metrics));
 
@@ -23,7 +33,13 @@ function render(state) {
   document.querySelector(".status-label").innerHTML = `<i></i> ${escapeHtml(state.project?.status || "演示运行中")}`;
   document.querySelector(".run-version").textContent = currentVersion;
   document.querySelector(".run-card-foot strong").textContent = latest.date;
+  $("#hero-tagline").textContent = site.heroTagline;
+  $("#hero-lede").textContent = site.heroLede;
+  $("#micro-copy").textContent = site.microCopy;
+  $("#guardrail-title").textContent = site.guardrailTitle;
+  $("#guardrail-copy").textContent = site.guardrailCopy;
   $("#footer-version").textContent = currentVersion;
+  $("#evolution-source").textContent = sourceLabel;
   $("#release-summary").textContent = releaseSummary;
   $("#release-details").textContent = releaseDetails;
   $("#score").textContent = score;
@@ -34,7 +50,7 @@ function render(state) {
   $("#learnability").textContent = `${state.metrics.learnability}%`;
   $("#learnability-line").style.width = `${state.metrics.learnability}%`;
   $("#next-hypothesis").textContent = state.nextHypothesis || "等待下一条假设。";
-  $("#selection-rationale").textContent = `当前综合分为 ${score}。下一轮会读取最新指标，优先关注当前最弱的一项。`;
+  $("#selection-rationale").textContent = selectionRationale;
 
   $("#cycle-bars").innerHTML = iterations.slice(-8).map((item) => `<i style="height:${Math.max(18, average(item.metrics))}%"></i>`).join("");
   $("#trajectory-chart").innerHTML = iterations.map((item, index) => {

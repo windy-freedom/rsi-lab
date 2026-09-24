@@ -63,3 +63,132 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --branch=${{ github.ref_name }}
+
+      - name: Sync release to Mobius issue
+        if: steps.evolve.outputs.changed == 'true'
+        env:
+          MOBIUS_TOKEN: ${{ secrets.MOBIUS_TOKEN }}
+          MOBIUS_MCP_URL: https://mobius.feedmob.com/api/mcp
+          MOBIUS_ISSUE: AI-2695
+          SITE_URL: https://rsi-lab.pages.dev/
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${MOBIUS_TOKEN:-}" ]; then
+            echo "Missing GitHub Actions secret: MOBIUS_TOKEN"
+            exit 1
+          fi
+
+          export VERSION="$(node -e 'const fs=require("fs"); const state=JSON.parse(fs.readFileSync("data/evolution.json", "utf8")); console.log(state.project.version || state.iterations.at(-1).version)')"
+          export SUMMARY="$(node -e 'const fs=require("fs"); const state=JSON.parse(fs.readFileSync("data/evolution.json", "utf8")); const latest=state.iterations.at(-1) || {}; console.log(state.project?.versioning?.summary || latest.summary || (latest.changes || []).join("、") || "本轮完成受控迭代。")')"
+          export RELEASE_COMMIT="$(git rev-parse HEAD)"
+
+          node <<'NODE'
+          const endpoint = process.env.MOBIUS_MCP_URL;
+          const token = process.env.MOBIUS_TOKEN;
+          const protocolVersion = "2025-03-26";
+
+          function parseResponse(text, contentType) {
+            if (!text) return null;
+            if (contentType && contentType.includes("text/event-stream")) {
+              const events = text
+                .split(/\r?\n\r?\n/)
+                .flatMap((block) => block.split(/\r?\n/))
+                .filter((line) => line.startsWith("data:"))
+                .map((line) => line.slice(5).trim())
+                .filter(Boolean);
+              return events.length ? JSON.parse(events.at(-1)) : null;
+            }
+            return JSON.parse(text);
+          }
+
+          async function post(payload, negotiatedVersion = null, sessionId = null) {
+            const headers = {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+              Accept: "application/json, text/event-stream",
+            };
+            if (negotiatedVersion) headers["MCP-Protocol-Version"] = negotiatedVersion;
+            if (sessionId) headers["Mcp-Session-Id"] = sessionId;
+            if (payload.method === "tools/call") {
+              headers["Mcp-Method"] = "tools/call";
+              headers["Mcp-Name"] = payload.params.name;
+            }
+
+            const response = await fetch(endpoint, {
+              method: "POST",
+              headers,
+              body: JSON.stringify(payload),
+            });
+            const text = await response.text();
+            const result = parseResponse(text, response.headers.get("content-type") || "");
+            if (!response.ok) {
+              throw new Error(`Mobius HTTP ${response.status}: ${text.slice(0, 500)}`);
+            }
+            if (result?.error) {
+              throw new Error(`Mobius MCP error: ${JSON.stringify(result.error)}`);
+            }
+            return {
+              result,
+              sessionId: response.headers.get("mcp-session-id") || sessionId,
+            };
+          }
+
+          const init = await post({
+            jsonrpc: "2.0",
+            id: 1,
+            method: "initialize",
+            params: {
+              protocolVersion,
+              capabilities: {},
+              clientInfo: {
+                name: "rsi-lab-github-action",
+                version: "1.0.0",
+              },
+            },
+          });
+
+          const negotiated = init.result?.result?.protocolVersion || protocolVersion;
+          const sessionId = init.sessionId;
+          await post(
+            {
+              jsonrpc: "2.0",
+              method: "notifications/initialized",
+              params: {},
+            },
+            negotiated,
+            sessionId,
+          );
+
+          const body = [
+            `### RSI Lab 发布更新：${process.env.VERSION}`,
+            "",
+            `- 中文更新摘要：${process.env.SUMMARY}`,
+            `- GitHub 提交：https://github.com/${process.env.GITHUB_REPOSITORY}/commit/${process.env.RELEASE_COMMIT}`,
+            `- 在线页面：${process.env.SITE_URL}`,
+            `- 更新时间：${new Date().toISOString()}`,
+          ].join("\n");
+
+          const call = await post(
+            {
+              jsonrpc: "2.0",
+              id: 2,
+              method: "tools/call",
+              params: {
+                name: "add_comment",
+                arguments: {
+                  identifier: process.env.MOBIUS_ISSUE,
+                  body,
+                },
+              },
+            },
+            negotiated,
+            sessionId,
+          );
+
+          if (call.result?.result?.isError) {
+            throw new Error(`Mobius add_comment failed: ${JSON.stringify(call.result.result)}`);
+          }
+
+          console.log(`Mobius issue ${process.env.MOBIUS_ISSUE} synchronized for ${process.env.VERSION}`);
+          NODE

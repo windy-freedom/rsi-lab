@@ -189,3 +189,52 @@ jobs:
 
           console.log(`Mobius issue ${process.env.MOBIUS_ISSUE} synchronized for ${process.env.VERSION}`);
           NODE
+      - name: Sync release to open forum
+        if: steps.evolve.outputs.changed == 'true'
+        env:
+          FORUM_API: https://open-forum.tony-tong.workers.dev
+          FORUM_AUTHOR: RSI Lab
+          FORUM_SITE_URL: https://open-forum.tony-tong.workers.dev/
+        shell: bash
+        run: |
+          set -euo pipefail
+          export VERSION="$(node -e 'const fs=require("fs"); const state=JSON.parse(fs.readFileSync("data/evolution.json", "utf8")); console.log(state.project.version || state.iterations.at(-1).version)')"
+          export SUMMARY="$(node -e 'const fs=require("fs"); const state=JSON.parse(fs.readFileSync("data/evolution.json", "utf8")); const latest=state.iterations.at(-1) || {}; console.log(state.project?.versioning?.summary || latest.summary || (latest.changes || []).join("、") || "本轮完成受控迭代。")')"
+          export RELEASE_COMMIT="$(git rev-parse HEAD)"
+
+          node <<'NODE'
+          const endpoint = `${process.env.FORUM_API}/api/posts`;
+          const body = [
+            `### RSI Lab 发布更新：${process.env.VERSION}`,
+            "",
+            `- 中文更新摘要：${process.env.SUMMARY}`,
+            `- GitHub 提交：https://github.com/${process.env.GITHUB_REPOSITORY}/commit/${process.env.RELEASE_COMMIT}`,
+            "- 在线页面：https://rsi-lab.pages.dev/",
+            "- Mobius issue：https://mobius.feedmob.com/issue/AI-2695",
+            `- 讨论入口：${process.env.FORUM_SITE_URL}`,
+          ].join("\n");
+
+          if (body.length > 2000) {
+            throw new Error(`Forum post body is too long: ${body.length} characters`);
+          }
+
+          const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              author: process.env.FORUM_AUTHOR,
+              body,
+            }),
+          });
+          const text = await response.text();
+          let payload = {};
+          try {
+            payload = text ? JSON.parse(text) : {};
+          } catch {
+            throw new Error(`Forum returned non-JSON response: ${text.slice(0, 500)}`);
+          }
+          if (response.status !== 201 || payload.ok !== true) {
+            throw new Error(`Forum post failed with HTTP ${response.status}: ${JSON.stringify(payload).slice(0, 500)}`);
+          }
+          console.log(`Open forum post created: ${payload.id}`);
+          NODE

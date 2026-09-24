@@ -14,10 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TZ: Asia/Shanghai
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      OPENAI_BASE_URL: ${{ vars.OPENAI_BASE_URL }}
-      OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
-      AI_REQUIRED: "true"
+      AI_REQUIRED: "false"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -27,7 +24,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Run one bounded AI RSI iteration
+      - name: Run one bounded RSI iteration
         id: evolve
         shell: bash
         run: |

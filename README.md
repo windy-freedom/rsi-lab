@@ -59,6 +59,7 @@
 2. 将本项目推送到 GitHub 的默认分支。
 3. 在 GitHub 配置上表中的 secrets / variable；其中 `OPENROUTER_API_KEY` 使用 OpenRouter 控制台创建的 API key。
 4. 手动运行一次 `Daily RSI evolution`，验证 AI 候选生成、提交和 Cloudflare 部署。
+   如果当天已经运行过，勾选 `force_ai` 可强制调用 OpenRouter AI 生成一个测试版本；该选项会在 AI 调用失败时直接让 Action 失败。
 5. 之后每天由 cron 自动运行；普通代码 push 则由 `deploy.yml` 发布。
 
 工作流默认使用 OpenRouter 的 `openrouter/free` 路由；如果免费模型暂时不可用，会自动使用受控规则候选完成本轮，并在迭代记录中标记为 `fallback`。

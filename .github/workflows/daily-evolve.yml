@@ -6,6 +6,11 @@ on:
     - cron: "0 1 * * *"
   workflow_dispatch:
     inputs:
+      force_ai:
+        description: "强制调用 OpenRouter AI 并生成一个测试版本"
+        required: false
+        default: false
+        type: boolean
       sync_current:
         description: "同步当前版本到 Mobius 和公开论坛，不生成新版本"
         required: false
@@ -26,7 +31,8 @@ jobs:
       OPENROUTER_MODEL: openrouter/free
       OPENROUTER_HTTP_REFERER: https://rsi-lab.pages.dev/
       OPENROUTER_X_TITLE: RSI Lab
-      AI_REQUIRED: "false"
+      FORCE_EVOLUTION: ${{ inputs.force_ai == true && 'true' || 'false' }}
+      AI_REQUIRED: ${{ inputs.force_ai == true && 'true' || 'false' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

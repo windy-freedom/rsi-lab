@@ -51,14 +51,17 @@
 | `CLOUDFLARE_API_TOKEN` | Secret | 允许 Pages 部署的 API Token |
 | `CLOUDFLARE_ACCOUNT_ID` | Secret | Cloudflare Account ID |
 | `CLOUDFLARE_PROJECT_NAME` | Repository variable | Cloudflare Pages 项目名 |
+| `OPENROUTER_API_KEY` | Secret | OpenRouter API key，用于调用 `openrouter/free` 路由 |
 
 初始化步骤：
 
 1. 创建一个 Cloudflare Pages 项目，构建方式选择“无构建”，输出目录填 `dist`。
 2. 将本项目推送到 GitHub 的默认分支。
-3. 在 GitHub 配置上表中的 secrets / variable。
-4. 手动运行一次 `Daily RSI evolution`，验证首次提交和 Cloudflare 部署。
+3. 在 GitHub 配置上表中的 secrets / variable；其中 `OPENROUTER_API_KEY` 使用 OpenRouter 控制台创建的 API key。
+4. 手动运行一次 `Daily RSI evolution`，验证 AI 候选生成、提交和 Cloudflare 部署。
 5. 之后每天由 cron 自动运行；普通代码 push 则由 `deploy.yml` 发布。
+
+工作流默认使用 OpenRouter 的 `openrouter/free` 路由；如果免费模型暂时不可用，会自动使用受控规则候选完成本轮，并在迭代记录中标记为 `fallback`。
 
 ## 5. 边界与安全护栏
 

@@ -95,10 +95,10 @@ function validateAiCandidate(candidate) {
 }
 
 async function askAi(state, previous, weakestMetric) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error("OPENAI_API_KEY is not configured");
-  const baseUrl = (process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/$/, "");
-  const model = process.env.OPENAI_MODEL || "gpt-5.6-luna";
+  const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error("OPENROUTER_API_KEY is not configured");
+  const baseUrl = (process.env.OPENROUTER_BASE_URL || process.env.OPENAI_BASE_URL || "https://openrouter.ai/api/v1").replace(/\/$/, "");
+  const model = process.env.OPENROUTER_MODEL || process.env.OPENAI_MODEL || "openrouter/free";
   const currentSite = { ...defaultSite, ...(state.site || {}) };
   const context = {
     currentMetrics: previous,
@@ -118,7 +118,12 @@ async function askAi(state, previous, weakestMetric) {
   const user = `根据以下 JSON 数据提出下一轮候选。当前最弱指标是“${weakestMetric}”。候选必须聚焦一个问题，变化要小，且能在页面上被看见。返回字段：focus、hypothesis、changes（1-4项）、rationale、evidence、delta（四个指标）、page。\n\n${JSON.stringify(context)}`;
   const response = await fetch(`${baseUrl}/responses`, {
     method: "POST",
-    headers: { "content-type": "application/json", authorization: `Bearer ${apiKey}` },
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${apiKey}`,
+      ...(process.env.OPENROUTER_HTTP_REFERER ? { "HTTP-Referer": process.env.OPENROUTER_HTTP_REFERER } : {}),
+      ...(process.env.OPENROUTER_X_TITLE ? { "X-Title": process.env.OPENROUTER_X_TITLE } : {})
+    },
     body: JSON.stringify({
       model,
       store: false,
@@ -198,7 +203,8 @@ const previous = latest?.metrics ?? state.metrics;
 const weakestMetric = Object.entries(previous).sort((a, b) => a[1] - b[1])[0]?.[0] ?? "clarity";
 let candidate;
 let source = "fallback";
-if (process.env.OPENAI_API_KEY) {
+const aiApiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY;
+if (aiApiKey) {
   try {
     candidate = await askAi(state, previous, weakestMetric);
     source = "ai";
@@ -208,7 +214,7 @@ if (process.env.OPENAI_API_KEY) {
     candidate = fallbackCandidate(state, previous, weakestMetric);
   }
 } else {
-  if (process.env.AI_REQUIRED === "true") throw new Error("AI_REQUIRED is true but OPENAI_API_KEY is missing");
+  if (process.env.AI_REQUIRED === "true") throw new Error("AI_REQUIRED is true but OPENROUTER_API_KEY is missing");
   candidate = fallbackCandidate(state, previous, weakestMetric);
 }
 const nextMetrics = Object.fromEntries(

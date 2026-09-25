@@ -185,9 +185,12 @@ if (!state.project || !Array.isArray(state.iterations) || !state.metrics) {
 }
 
 const latest = state.iterations.at(-1);
-if (latest?.date === today) {
+if (latest?.date === today && process.env.FORCE_EVOLUTION !== "true") {
   console.log(`No-op: RSI already evolved on ${today}.`);
   process.exit(0);
+}
+if (latest?.date === today && process.env.FORCE_EVOLUTION === "true") {
+  console.log(`Forced RSI evolution on ${today} for an AI verification run.`);
 }
 
 const versionPattern = /^v(\d+)\.(\d+)\.(\d+)$/;

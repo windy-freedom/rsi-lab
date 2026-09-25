@@ -20,6 +20,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TZ: Asia/Shanghai
+      # OpenRouter free router: AI is preferred, but bounded fallback keeps the scheduled run resilient.
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      OPENROUTER_BASE_URL: https://openrouter.ai/api/v1
+      OPENROUTER_MODEL: openrouter/free
+      OPENROUTER_HTTP_REFERER: https://rsi-lab.pages.dev/
+      OPENROUTER_X_TITLE: RSI Lab
       AI_REQUIRED: "false"
     steps:
       - name: Checkout repository

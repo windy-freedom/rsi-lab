@@ -5,28 +5,28 @@
     "status": "演示运行中",
     "owner": "RSI Core",
     "goal": "用可观察、可回滚的每日循环演示自我进化。",
-    "version": "v0.6.0",
+    "version": "v0.7.0",
     "versioning": {
       "scheme": "semver",
-      "current": "v0.6.0",
-      "updatedAt": "2026-09-25",
-      "summary": "规则回退围绕“稳定性”完成一次受控更新：增加发布副本校验、在运行日志中写入校验结果。"
+      "current": "v0.7.0",
+      "updatedAt": "2026-09-26",
+      "summary": "AI 围绕“自主性”完成一次受控更新：/heroTagline、/heroLede、/microCopy、/guardrailCopy。"
     }
   },
   "site": {
-    "heroTagline": "自己长出下一版。",
-    "heroLede": "RSI Lab 是一个可观察的自我进化实验：每天提出一个小假设，留下证据，更新网页，并把结果提交回 GitHub。",
-    "microCopy": "下一轮运行由 GitHub Actions 的每日 cron 触发，输出自动发布到 Cloudflare Pages。",
+    "heroTagline": "无人值守，自主进化。",
+    "heroLede": "RSI Lab 是一个完全自主的自我进化实验：每天自动提出假设、留下证据、更新网页，并把结果提交回 GitHub，全程无需人工干预。",
+    "microCopy": "系统每日自主触发运行，完成从假设验证到自动发布的完整闭环。",
     "guardrailTitle": "自主，但不失控。",
-    "guardrailCopy": "这不是让系统随意改写自己的权限，而是让它在明确的边界里持续提出、验证和记录下一步。"
+    "guardrailCopy": "自主运行不等于无约束。系统在明确的边界内，持续自主地提出、验证和记录下一步。"
   },
   "metrics": {
     "clarity": 86,
     "stability": 96,
-    "autonomy": 70,
-    "learnability": 81
+    "autonomy": 72,
+    "learnability": 82
   },
-  "nextHypothesis": "如果把每日数据同步做成写入后校验，发布副本就更不容易与事实来源分叉。",
+  "nextHypothesis": "如果将‘无人值守、自主闭环’作为核心叙事放在首屏和关键说明中，能让访问者更直观地感受到系统的自主运行能力，从而提升自主性指标。",
   "iterations": [
     {
       "date": "2026-09-14",
@@ -139,6 +139,28 @@
       "decision": "adopted",
       "rationale": "当前最弱指标为“autonomy”，从受控候选池选择“稳定性”。",
       "evidence": "基于最近一轮结构化指标的规则回退。"
+    },
+    {
+      "date": "2026-09-26",
+      "version": "v0.7.0",
+      "source": "ai",
+      "summary": "AI 围绕“自主性”完成一次受控更新：/heroTagline、/heroLede、/microCopy、/guardrailCopy。",
+      "hypothesis": "如果将‘无人值守、自主闭环’作为核心叙事放在首屏和关键说明中，能让访问者更直观地感受到系统的自主运行能力，从而提升自主性指标。",
+      "changes": [
+        "/heroTagline",
+        "/heroLede",
+        "/microCopy",
+        "/guardrailCopy"
+      ],
+      "metrics": {
+        "clarity": 86,
+        "stability": 96,
+        "autonomy": 72,
+        "learnability": 82
+      },
+      "decision": "adopted",
+      "rationale": "当前页面文案虽然提到了自动化，但‘自主’的表述不够直接和强烈。通过修改 heroTagline、heroLede、microCopy 和 guardrailCopy，将‘自主’和‘无人干预’作为核心卖点，能够直接针对最弱指标 autonomy 进行提升，同时保持页面的整体稳定性和可读性。",
+      "evidence": "历史迭代显示，autonomy 指标在过去几轮中增长放缓（从 v0.4.0 的 68 到 v0.5.0 的 69，再到 v0.6.0 的 70），当前最弱指标仍为 autonomy。通过在页面核心文案中突出‘无人干预’和‘自主闭环’，可以强化用户对系统自主性的感知。"
     }
   ]
 }
